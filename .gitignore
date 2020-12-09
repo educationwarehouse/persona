@@ -1,7 +1,4 @@
 # web2py specific
-sessions/
-uploads/
-errors/
 private/appconfig.ini 
 
 

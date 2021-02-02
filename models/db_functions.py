@@ -9,7 +9,8 @@ def current_dienstverbanden(dossier_id):
     """
     rows = db(db.dienstverband.dossier_id == dossier_id).select()
     today = datetime.date.today()
-    dienstverbanden = [_ for _ in rows if _.einddatum >= today >= _.begindatum if not None]
+    # dienstverbanden = [_ for _ in rows if _.einddatum >= today >= _.begindatum if not None]
+    dienstverbanden = [r for r in rows if r.einddatum is not None and r.einddatum >= today >= r.begindatum if not None]
     return dienstverbanden
 
 

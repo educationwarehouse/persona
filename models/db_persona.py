@@ -9,9 +9,11 @@ class NO_ROLE_OVERLAP:
     used for reference fields, rendered as a dropbox.
     """
 
-    def __init__(self, error_message='Een of meerdere rollen zijn tijdens deze periode al toegewezen aan dit dossier'):
+    def __init__(self, multiple=True,
+                 error_message='Een of meerdere rollen zijn tijdens deze periode al toegewezen aan dit dossier'):
         self.error_message = error_message
         self.roles = db(db.rol.id > 0).select()  # we're working with every role in the database for the options field
+        self.multiple = multiple  # multiple=True because we're allowing for multiple roles to be selected
 
     def __call__(self, value):
         try:

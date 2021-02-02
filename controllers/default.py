@@ -9,11 +9,20 @@ def index():
     response.flash = T("Hello World")
     return dict(message=T('Welcome to web2py!'))
 
-# ---- API (example) -----
-@auth.requires_login()
-def api_get_user_email():
-    if not request.env.request_method == 'GET': raise HTTP(403)
-    return response.json({'status':'success', 'email':auth.user.email})
+@auth.requires_membership('admin')
+def dossier():
+    dossier_id = request.vars['id']
+    if not dossier_id:
+        return 'OEPS! er is iets fout gegaan.'
+    dossier = db.dossier[dossier_id]
+    form = SQLFORM(db.dossier, dossier)
+    query = db.dienstverband.dossier_id == dossier_id
+    # using constraints to execute a query with in a smartgrid, we're using this to only get the
+    # dienstverband records of this current dossier.
+    dienstverbanden = SQLFORM.smartgrid(db.dienstverband, constraints=dict(dienstverband=query))
+    if form.process().accepted:
+        response.flash = 'Wijzigingen opgeslagen.'
+    return dict(dossier=dossier, form=form, dienstverbanden=dienstverbanden)
 
 # ---- Smart Grid (example) -----
 @auth.requires_membership('admin') # can only be accessed by members of admin groupd

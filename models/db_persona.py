@@ -52,7 +52,6 @@ class NO_ROLE_OVERLAP:
         for role_id in values:
             # getting the rol record belonging to role_id
             role = db.rol[role_id]
-            # appending because check_conflicts() returns either True or False
             conflicting = check_conflicts(active_dienstverbanden=dienstverbanden,
                                           role=role,
                                           begin_date=begin if begin else None)

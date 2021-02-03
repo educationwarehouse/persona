@@ -8,20 +8,20 @@
 @auth.requires_membership('admin')
 def index():
     smartgrid = SQLFORM.smartgrid(db.dossier,
-                                  links=[lambda r: A('Dossier bekijken', _href=URL('default', 'dossier', vars=dict(
-                                      id=r.id))) if 'view' in request.args or not request.vars['_signature'] else ''
-                                         ])
+                                  links=[lambda r: A('Dossier bekijken', _href=URL('default', 'dossier', vars=dict(dossier=r.id))) if 'view' in request.args or not request.vars['_signature'] else ''])
     return dict(smartgrid=smartgrid)
 
 
 @auth.requires_membership('admin')
 def dossier():
-    dossier_id = request.vars['id']
+    dossier_id = request.vars['dossier']
     if not dossier_id:
         return 'OEPS! er is iets fout gegaan.'
     dossier = db.dossier[dossier_id]
     form = SQLFORM(db.dossier, dossier)
     query = db.dienstverband.dossier_id == dossier_id
+    db.dienstverband.dossier_id.default = dossier.id  # default value needs to be the id of the current dossier
+    db.dienstverband.dossier_id.writable = False  # setting this to False because we only want to edit records for this dossier
     # using constraints to execute a query with in a smartgrid, we're using this to only get the
     # dienstverband records of this current dossier.
     dienstverbanden = SQLFORM.smartgrid(db.dienstverband, constraints=dict(dienstverband=query))

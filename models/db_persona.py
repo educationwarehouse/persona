@@ -109,8 +109,8 @@ db.define_table('dienstverband',
                 # rol_id has to be a list of references for it to allow multiple roles within the same
                 # dienstverband record
                 Field('rol_id', 'list:reference rol', requires=NO_ROLE_OVERLAP(), label='Rol(len)'),
-                Field('begindatum', 'date'),
-                Field('einddatum', 'date'),
+                Field('begindatum', 'date', requires=IS_EMPTY_OR(IS_DATE())),
+                Field('einddatum', 'date', requires=IS_EMPTY_OR(IS_DATE())),
                 Field('dossier_id', 'reference dossier', required=True, label='Dossier'),
                 plural='dienstverbanden'
                 )

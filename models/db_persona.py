@@ -36,7 +36,7 @@ class NO_ROLE_OVERLAP:
             return value, self.error_message
 
         # this allows for editing the 'dienstverbanden', it ignores the validation
-        if 'edit' in request.url: # TODO: dit moet later wellicht anders, werkt voor nu
+        if 'edit' in request.url:  # TODO: might need to change later, works for now
             return value, None
 
         # getting all of the records that are currently active for this dossier

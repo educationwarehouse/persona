@@ -61,17 +61,6 @@ class NO_ROLE_OVERLAP:
             else:
                 pass
         return value, None
-        # else:
-        #     # getting selected role from the database
-        #     role = db.rol[value]
-        #     conflicting = check_conflicts(active_dienstverbanden=dienstverbanden,
-        #                                 role=role,
-        #                                 begin_date=begin if begin else None)
-        #     # if there are any conflicts, show the error message
-        #     if conflicting:
-        #         return value, self.error_message
-        #     else:
-        #         return value, None
 
 
 class IS_CAPITALIZED:

@@ -27,7 +27,7 @@ def check_conflicts(active_dienstverbanden, role, begin_date=None):
         # creating a list of records that have the same role as the role we're trying to assign for the given time
         # period. we're checking if role.id is in _.rol_id because _.rol_id is a list of roles assigned to a
         # 'dienstverband' record. because we're allowing for multiple roles to be selected and the field is a list of
-        # references, we always need to check inside the list.
+        # references, we always need to check if the value exists within the list.
         conflicts = [_ for _ in active_dienstverbanden if role.id in _.rol_id and _.einddatum >= begin.date()]
         return True if conflicts else False
     # obviously, if no begin date has been given, this role can't overlap

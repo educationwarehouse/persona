@@ -16,17 +16,25 @@ def index():
 def dossier():
     dossier_id = request.vars['dossier']
     if not dossier_id:
-        return 'OEPS! er is iets fout gegaan.'
+        return 'OEPS! er is geen dossier geselecteerd.'
+
     dossier = db.dossier[dossier_id]
+    if not dossier:
+        return 'OEPS! dit dossier bestaat niet (meer).'
+
     form = SQLFORM(db.dossier, dossier)
     query = db.dienstverband.dossier_id == dossier_id
+
     db.dienstverband.dossier_id.default = dossier.id  # default value needs to be the id of the current dossier
     db.dienstverband.dossier_id.writable = False  # setting this to False because we only want to edit records for this dossier
+
     # using constraints to execute a query with in a smartgrid, we're using this to only get the
     # dienstverband records of this current dossier.
     dienstverbanden = SQLFORM.smartgrid(db.dienstverband, constraints=dict(dienstverband=query))
+
     if form.process().accepted:
         response.flash = 'Wijzigingen opgeslagen.'
+
     return dict(dossier=dossier, form=form, dienstverbanden=dienstverbanden)
 
 

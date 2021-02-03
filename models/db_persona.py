@@ -34,10 +34,11 @@ class NO_ROLE_OVERLAP:
         if not value:
             self.error_message = 'Dit veld mag niet leeg zijn'
             return value, self.error_message
-        # TODO: dit moet later wellicht anders, werkt voor nu
+
         # this allows for editing the 'dienstverbanden', it ignores the validation
-        if 'edit' in request.url:
+        if 'edit' in request.url: # TODO: dit moet later wellicht anders, werkt voor nu
             return value, None
+
         # getting all of the records that are currently active for this dossier
         dienstverbanden = current_dienstverbanden(request.vars.dossier_id)
         begin = request.vars.begindatum

@@ -7,9 +7,11 @@
 # ---- example index page ----
 @auth.requires_membership('admin')
 def index():
-    smartgrid = SQLFORM.smartgrid(db.dossier,
-                                  links=[lambda r: A('Dossier bekijken', _href=URL('default', 'dossier', vars=dict(dossier=r.id))) if 'view' in request.args or not request.vars['_signature'] else ''])
-    return dict(smartgrid=smartgrid)
+    grid = SQLFORM.grid(db.dossier,
+                                  links=[lambda r: A('Dossier bekijken', _href=URL('default', 'dossier', vars=dict(
+                                      dossier=r.id))) if 'view' in request.args or not request.vars[
+                                      '_signature'] else ''])
+    return dict(grid=grid)
 
 
 @auth.requires_membership('admin')
@@ -18,7 +20,7 @@ def dossier():
     if not dossier_id:
         return 'OEPS! er is geen dossier geselecteerd.'
 
-    dossier = db.dossier[dossier_id]
+    dossier = db(db.dossier.id == dossier_id).select().first()
     if not dossier:
         return 'OEPS! dit dossier bestaat niet (meer).'
 
@@ -30,8 +32,8 @@ def dossier():
 
     # using constraints to execute a query with in a smartgrid, we're using this to only get the
     # dienstverband records of this current dossier.
-    dienstverbanden = SQLFORM.smartgrid(db.dienstverband, constraints=dict(dienstverband=query))
-
+    dienstverbanden = SQLFORM.smartgrid(db.dienstverband, constraints=dict(dienstverband=query),
+                                        onvalidation=NO_ROLE_OVERLAP)
     if form.process().accepted:
         response.flash = 'Wijzigingen opgeslagen.'
 

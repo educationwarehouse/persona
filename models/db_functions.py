@@ -10,7 +10,7 @@ def NO_MEMBERSHIP_OVERLAP(form):
             form = SQLFORM()
             if form.process(onvalidation=NO_MEMBERSHIP_OVERLAP).accepted
 
-    this should only be used with a form that interacts with the db.role_membership table
+    this should only be used with a SQLFORM that's based on the db.role_membership table
     """
     if not form.vars.role_ids:
         form.errors.role_ids = T('Select a role to assign to this role membership')
@@ -54,7 +54,7 @@ def active_role_memberships(person_id):
 
 
 def check_conflicts(active_role_memberships, exclude, begin_date=None):
-    """Checks if there are any duplicate roles in the given period of time.
+    """Checks if there are any memberships that conflict with the current membership we're trying to insert.
 
     :param active_role_memberships: the role_membership records you need to check, use active_role_memberships() for this.
     :param exclude: the record that's allowed to be overridden
@@ -69,6 +69,6 @@ def check_conflicts(active_role_memberships, exclude, begin_date=None):
         if exclude:
             conflicts.remove(exclude) if exclude in conflicts else []
         return bool(conflicts)
-    # obviously, if no begin date has been given, this role can't overlap
+    # obviously, if no begin date has been given, this membership can't overlap
     else:
         return False

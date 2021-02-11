@@ -54,7 +54,7 @@ else:
 # by default give a view/generic.extension to all actions from localhost
 # none otherwise. a pattern can be 'controller/function.extension'
 # -------------------------------------------------------------------------
-response.generic_patterns = [] 
+response.generic_patterns = []
 if request.is_local and not configuration.get('app.production'):
     response.generic_patterns.append('*')
 
@@ -130,6 +130,7 @@ response.google_analytics_id = configuration.get('google.analytics_id')
 # -------------------------------------------------------------------------
 if configuration.get('scheduler.enabled'):
     from gluon.scheduler import Scheduler
+
     scheduler = Scheduler(db, heartbeat=configuration.get('scheduler.heartbeat'))
 
 # -------------------------------------------------------------------------
@@ -154,4 +155,4 @@ if configuration.get('scheduler.enabled'):
 # -------------------------------------------------------------------------
 # auth.enable_record_versioning(db)
 
-auth.settings.create_user_groups = False
+test_db = DAL('sqlite://test.sqlite')

@@ -7,43 +7,43 @@
 # ---- example index page ----
 @auth.requires_membership('admin')
 def index():
-    grid = SQLFORM.grid(db.dossier,
-                                  links=[lambda r: A('Dossier bekijken', _href=URL('default', 'dossier', vars=dict(
-                                      dossier=r.id))) if 'view' in request.args or not request.vars[
-                                      '_signature'] else ''])
+    grid = SQLFORM.grid(db.person,
+                        links=[lambda r: A('Dossier bekijken', _href=URL('default', 'person', vars=dict(person=r.id)))])
     return dict(grid=grid)
 
 
 @auth.requires_membership('admin')
-def dossier():
-    dossier_id = request.vars['dossier']
-    if not dossier_id:
-        return 'OEPS! er is geen dossier geselecteerd.'
+def person():
+    person_id = request.vars['person']
+    if not person_id:
+        return T("Oops! No person has been selected.")
 
-    dossier = db(db.dossier.id == dossier_id).select().first()
-    if not dossier:
-        return 'OEPS! dit dossier bestaat niet (meer).'
+    person = db(db.person.id == person_id).select().first()
+    if not person:
+        return T('Oops! This person doesn\'t exist (anymore).')
 
-    form = SQLFORM(db.dossier, dossier)
-    query = db.dienstverband.dossier_id == dossier_id
+    form = SQLFORM(db.person, person)
+    query = db.role_membership.person_id == person_id
 
-    db.dienstverband.dossier_id.default = dossier.id  # default value needs to be the id of the current dossier
-    db.dienstverband.dossier_id.writable = False  # setting this to False because we only want to edit records for this dossier
+    db.role_membership.person_id.default = person.id  # default value needs to be the id of the current dossier
+    db.role_membership.person_id.writable = False  # setting this to False because we only want to edit records for this dossier
 
     # using constraints to execute a query with in a smartgrid, we're using this to only get the
-    # dienstverband records of this current dossier.
-    dienstverbanden = SQLFORM.smartgrid(db.dienstverband, constraints=dict(dienstverband=query),
-                                        onvalidation=NO_ROLE_OVERLAP)
+    # role_membership records of this current person.
+    # role_memberships = SQLFORM.smartgrid(db.role_membership, constraints=dict(role_membership=query),
+    #                                      onvalidation=NO_ROLE_OVERLAP)
+    role_memberships = SQLFORM.smartgrid(db.role_membership, constraints=dict(role_memberships=query),
+                                         onvalidation=NO_MEMBERSHIP_OVERLAP)
     if form.process().accepted:
         response.flash = 'Wijzigingen opgeslagen.'
 
-    return dict(dossier=dossier, form=form, dienstverbanden=dienstverbanden)
+    return dict(person=person, form=form, role_memberships=role_memberships)
 
 
 @auth.requires_membership('admin')
-def rollen():
-    rollen_smartgrid = SQLFORM.smartgrid(db.rol)
-    return dict(rollen_smartgrid=rollen_smartgrid)
+def roles():
+    roles_smartgrid = SQLFORM.smartgrid(db.role)
+    return dict(roles_smartgrid=roles_smartgrid)
 
 
 # ---- Action for login/register/etc (required for auth) -----

@@ -30,12 +30,10 @@ def person():
 
     # using constraints to execute a query with in a smartgrid, we're using this to only get the
     # role_membership records of this current person.
-    # role_memberships = SQLFORM.smartgrid(db.role_membership, constraints=dict(role_membership=query),
-    #                                      onvalidation=NO_ROLE_OVERLAP)
     role_memberships = SQLFORM.smartgrid(db.role_membership, constraints=dict(role_memberships=query),
                                          onvalidation=NO_MEMBERSHIP_OVERLAP)
     if form.process().accepted:
-        response.flash = 'Wijzigingen opgeslagen.'
+        response.flash = T('Saved changes')
 
     return dict(person=person, form=form, role_memberships=role_memberships)
 

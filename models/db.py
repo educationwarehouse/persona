@@ -50,11 +50,16 @@ else:
     # session.connect(request, response, db = MEMDB(Client()))
     # ---------------------------------------------------------------------
 
+# --------------
+# Import feature installer
+# --------------
+from features import feature_installer
+
 # -------------------------------------------------------------------------
 # by default give a view/generic.extension to all actions from localhost
 # none otherwise. a pattern can be 'controller/function.extension'
 # -------------------------------------------------------------------------
-response.generic_patterns = [] 
+response.generic_patterns = []
 if request.is_local and not configuration.get('app.production'):
     response.generic_patterns.append('*')
 
@@ -130,6 +135,7 @@ response.google_analytics_id = configuration.get('google.analytics_id')
 # -------------------------------------------------------------------------
 if configuration.get('scheduler.enabled'):
     from gluon.scheduler import Scheduler
+
     scheduler = Scheduler(db, heartbeat=configuration.get('scheduler.heartbeat'))
 
 # -------------------------------------------------------------------------

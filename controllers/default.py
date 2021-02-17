@@ -8,7 +8,7 @@
 @auth.requires_membership('admin')
 def index():
     grid = SQLFORM.grid(db.person,
-                        links=[lambda r: A('Dossier bekijken', _href=URL('default', 'person', vars=dict(person=r.id)))])
+                        links=[lambda r: A(T('View dossier'), _href=URL('default', 'person', vars=dict(person=r.id)))])
     return dict(grid=grid)
 
 
@@ -31,7 +31,7 @@ def person():
     # using constraints to execute a query with in a smartgrid, we're using this to only get the
     # role_membership records of this current person.
     role_memberships = SQLFORM.smartgrid(db.role_membership, constraints=dict(role_memberships=query),
-                                         onvalidation=NO_MEMBERSHIP_OVERLAP)
+                                         onvalidation=NO_MEMBERSHIP_PERIOD_OVERLAP)
     if form.process().accepted:
         response.flash = T('Saved changes')
 

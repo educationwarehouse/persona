@@ -5,29 +5,44 @@
 # -------------------------------------------------------------------------
 
 # ---- example index page ----
+@auth.requires_membership('admin')
 def index():
-    response.flash = T("Hello World")
-    return dict(message=T('Welcome to web2py!'))
-
-# ---- API (example) -----
-@auth.requires_login()
-def api_get_user_email():
-    if not request.env.request_method == 'GET': raise HTTP(403)
-    return response.json({'status':'success', 'email':auth.user.email})
-
-# ---- Smart Grid (example) -----
-@auth.requires_membership('admin') # can only be accessed by members of admin groupd
-def grid():
-    response.view = 'generic.html' # use a generic view
-    tablename = request.args(0)
-    if not tablename in db.tables: raise HTTP(403)
-    grid = SQLFORM.smartgrid(db[tablename], args=[tablename], deletable=False, editable=False)
+    grid = SQLFORM.grid(db.person,
+                        links=[lambda r: A(T('View dossier'), _href=URL('default', 'person', vars=dict(person=r.id)))])
     return dict(grid=grid)
 
-# ---- Embedded wiki (example) ----
-def wiki():
-    auth.wikimenu() # add the wiki to the menu
-    return auth.wiki() 
+
+@auth.requires_membership('admin')
+def person():
+    person_id = request.vars['person']
+    if not person_id:
+        return T("Oops! No person has been selected.")
+
+    person = db(db.person.id == person_id).select().first()
+    if not person:
+        return T('Oops! This person doesn\'t exist (anymore).')
+
+    form = SQLFORM(db.person, person)
+    query = db.role_membership.person_id == person_id
+
+    db.role_membership.person_id.default = person.id  # default value needs to be the id of the current dossier
+    db.role_membership.person_id.writable = False  # setting this to False because we only want to edit records for this dossier
+
+    # using constraints to execute a query with in a smartgrid, we're using this to only get the
+    # role_membership records of this current person.
+    role_memberships = SQLFORM.smartgrid(db.role_membership, constraints=dict(role_memberships=query),
+                                         onvalidation=NO_MEMBERSHIP_PERIOD_OVERLAP)
+    if form.process().accepted:
+        response.flash = T('Saved changes')
+
+    return dict(person=person, form=form, role_memberships=role_memberships)
+
+
+@auth.requires_membership('admin')
+def roles():
+    roles_smartgrid = SQLFORM.smartgrid(db.role)
+    return dict(roles_smartgrid=roles_smartgrid)
+
 
 # ---- Action for login/register/etc (required for auth) -----
 def user():
@@ -48,6 +63,7 @@ def user():
     """
     return dict(form=auth())
 
+
 # ---- action to server uploaded static content (required) ---
 @cache.action()
 def download():
@@ -56,3 +72,25 @@ def download():
     http://..../[app]/default/download/[filename]
     """
     return response.download(request, db)
+
+# # ---- API (example) -----
+# @auth.requires_login()
+# def api_get_user_email():
+#     if not request.env.request_method == 'GET': raise HTTP(403)
+#     return response.json({'status': 'success', 'email': auth.user.email})
+#
+#
+# # ---- Smart Grid (example) -----
+# @auth.requires_membership('admin')  # can only be accessed by members of admin groupd
+# def grid():
+#     response.view = 'generic.html'  # use a generic view
+#     tablename = request.args(0)
+#     if not tablename in db.tables: raise HTTP(403)
+#     grid = SQLFORM.smartgrid(db[tablename], args=[tablename], deletable=False, editable=False)
+#     return dict(grid=grid)
+#
+#
+# # ---- Embedded wiki (example) ----
+# def wiki():
+#     auth.wikimenu()  # add the wiki to the menu
+#     return auth.wiki()
